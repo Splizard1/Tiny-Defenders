@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 bevy = "0.18"
+bevy_procedural_tilemaps = "0.2.0"
