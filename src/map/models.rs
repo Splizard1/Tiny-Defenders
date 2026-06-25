@@ -1,9 +1,9 @@
-use crate::map::assests::SpawnableAssest;
-use evy_precedural_tilemaps::prelude::*;
+use crate::map::assets::SpawnableAsset;
+use bevy_procedural_tilemaps::prelude::*;
 
 pub struct TerrainModelBuilder {
     pub models: ModelCollection<Cartesian3D>,
-    pub assests: Vec<Vec<SpawnableAsset>>,
+    pub assets: Vec<Vec<SpawnableAsset>>,
 }
 impl TerrainModelBuilder {
     pub fn new() -> Self {

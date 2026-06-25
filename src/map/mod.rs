@@ -1,4 +1,4 @@
-pub mod assests;
+pub mod assets;
 pub mod generate;
 pub mod models;
 pub mod rules;

@@ -10,7 +10,7 @@ pub struct DirtLayerSockets {
     pub material: Socket,   // What dirt connects to horizontally
 }
 
-pub fn create_sockets(socket_collection: &mut SocketCollection) -> TerraiSockets {
+pub fn create_sockets(socket_collection: &mut SocketCollection) -> TerrainSockets {
     let mut new_socket = || -> Socket { socket_collection.create() };
 
     let sockets = TerrainSockets {
