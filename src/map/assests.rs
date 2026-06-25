@@ -43,3 +43,53 @@ impl TilemapHandles {
         )
     }
 }
+
+//method to load atlas image and set up the layout
+pub fn prepare_tilemap_handles(
+    asset_server: &Res<AssetServer>,
+    atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
+    assets_directory: &str,
+    tilemap_file: &str,
+) -> TilemapHandles {
+    let image = asset_server.load::<Image>(format!("{assets_directory}/{tilemap_file}"));
+    let mut layout = TextureAtlasLayout::new_empty(TILEMAP.atlas_size());
+    for index in 0..TILEMAP.sprites.len() {
+        layout.add_texture(TILEMAP.sprite_rect(index));
+    }
+    let layout = atlas_layouts.add(layout);
+
+    TilemapHandles { image, layout }
+}
+
+// Convert sprite names into objects to be rendered
+pub fn load_assets(
+    tilemap_handles: &TilemapHandles,
+    assets_definitions: Vec<Vec<SpawnableAsset>>,
+) -> ModelsAssets<Sprite> {
+    let mut models_assets = ModelsAssets::<Sprite>::new();
+    for (model_index, assets) in assets_definitions.into_iter().enumerate() {
+        for asset_def in assets {
+            let SpawnableAsset {
+                sprite_name,
+                grid_offset,
+                offset,
+                components_spawner,
+            } = asset_def;
+
+            let Some(atlas_index) = TILEMAP.sprite_index(sprite_name) else {
+                panic!("Unknown atlas sprite '{}'", sprite_name);
+            };
+
+            models_assets.add(
+                model_index,
+                ModelAsset {
+                    assets_bundle: tilemap_handles.sprite(atlas_index),
+                    grid_offset,
+                    world_offset: offset,
+                    spawn_commands: components_spawner,
+                },
+            )
+        }
+    }
+    models_assets
+}
