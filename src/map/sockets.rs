@@ -4,6 +4,7 @@ pub struct TerrainSockets {
     pub dirt: DirtLayerSockets,
     pub void: Socket,
     pub grass: GrassLayerSockets,
+    pub yellow_grass: YellowGrassLayerSockets,
 }
 
 pub struct DirtLayerSockets {
@@ -20,7 +21,11 @@ pub struct GrassLayerSockets {
     pub grass_and_void: Socket,
     pub grass_fill_up: Socket,
 }
-
+pub struct YellowGrassLayerSockets {
+    pub layer_up: Socket,
+    pub layer_down: Socket,
+    pub yellow_grass_fill_down: Socket,
+}
 pub fn create_sockets(socket_collection: &mut SocketCollection) -> TerrainSockets {
     let mut new_socket = || -> Socket { socket_collection.create() };
 
@@ -38,6 +43,11 @@ pub fn create_sockets(socket_collection: &mut SocketCollection) -> TerrainSocket
             void_and_grass: new_socket(),
             grass_and_void: new_socket(),
             grass_fill_up: new_socket(),
+        },
+        yellow_grass: YellowGrassLayerSockets {
+            layer_up: new_socket(),
+            layer_down: new_socket(),
+            yellow_grass_fill_down: new_socket(),
         },
     };
     sockets
