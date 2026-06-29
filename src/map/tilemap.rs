@@ -35,9 +35,76 @@ pub const TILEMAP: TilemapDefinition = TilemapDefinition {
     tile_height: 32,
     atlas_width: 256,
     atlas_height: 320,
-    sprites: &[TilemapSprite {
-        name: "dirt",
-        pixel_x: 128,
-        pixel_y: 0,
-    }],
+    sprites: &[
+        TilemapSprite {
+            name: "dirt",
+            pixel_x: 128,
+            pixel_y: 0,
+        },
+        TilemapSprite {
+            name: "green_grass",
+            pixel_x: 160,
+            pixel_y: 0,
+        },
+        TilemapSprite {
+            name: "green_grass_corner_in_tl",
+            pixel_x: 192,
+            pixel_y: 0,
+        },
+        TilemapSprite {
+            name: "green_grass_corner_in_tr",
+            pixel_x: 224,
+            pixel_y: 0,
+        },
+        TilemapSprite {
+            name: "green_grass_corner_in_bl",
+            pixel_x: 192,
+            pixel_y: 32,
+        },
+        TilemapSprite {
+            name: "green_grass_corner_in_br",
+            pixel_x: 224,
+            pixel_y: 32,
+        },
+        TilemapSprite {
+            name: "green_grass_corner_out_tl",
+            pixel_x: 0,
+            pixel_y: 64,
+        },
+        TilemapSprite {
+            name: "green_grass_corner_out_tr",
+            pixel_x: 32,
+            pixel_y: 64,
+        },
+        TilemapSprite {
+            name: "green_grass_corner_out_bl",
+            pixel_x: 0,
+            pixel_y: 96,
+        },
+        TilemapSprite {
+            name: "green_grass_corner_out_br",
+            pixel_x: 32,
+            pixel_y: 96,
+        },
+        TilemapSprite {
+            name: "green_grass_side_t",
+            pixel_x: 64,
+            pixel_y: 64,
+        },
+        TilemapSprite {
+            name: "green_grass_side_r",
+            pixel_x: 96,
+            pixel_y: 64,
+        },
+        TilemapSprite {
+            name: "green_grass_side_l",
+            pixel_x: 64,
+            pixel_y: 96,
+        },
+        TilemapSprite {
+            name: "green_grass_side_b",
+            pixel_x: 96,
+            pixel_y: 96,
+        },
+    ],
 };

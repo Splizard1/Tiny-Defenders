@@ -22,7 +22,7 @@ const NODE_SIZE: Vec3 = Vec3::new(TILE_SIZE, TILE_SIZE, 1.);
 
 const ASSETS_SCALE: Vec3 = Vec3::ONE;
 /// Number of z layers in the map, derived from the default terrain layers.
-const GRID_Z: u32 = 1;
+const GRID_Z: u32 = 2;
 
 pub fn map_pixel_dimensions() -> Vec2 {
     Vec2::new(TILE_SIZE * GRID_X as f32, TILE_SIZE * GRID_Y as f32)

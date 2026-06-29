@@ -156,7 +156,8 @@ fn animate_player(
             }
         }
     } else if just_stopped {
-        // Not moving: keep current frame to avoid snap. Reset timer on transition to idle.
+        // Snap to the neutral standing frame (column 0) when stopping.
+        atlas.index = row_start_index(anim.facing);
         timer.reset();
     }
 
@@ -187,6 +188,6 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, spawn_player)
-            .add_systems(Update, (move_player, animate_player));
+            .add_systems(Update, (move_player, animate_player).chain());
     }
 }
