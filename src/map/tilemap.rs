@@ -236,5 +236,110 @@ pub const TILEMAP: TilemapDefinition = TilemapDefinition {
             pixel_x: 224,
             pixel_y: 224,
         },
+        TilemapSprite {
+            name: "big_tree_1_tl",
+            pixel_x: 0,
+            pixel_y: 0,
+        },
+        TilemapSprite {
+            name: "big_tree_1_tr",
+            pixel_x: 32,
+            pixel_y: 0,
+        },
+        TilemapSprite {
+            name: "big_tree_1_bl",
+            pixel_x: 0,
+            pixel_y: 32,
+        },
+        TilemapSprite {
+            name: "big_tree_1_br",
+            pixel_x: 32,
+            pixel_y: 32,
+        },
+        TilemapSprite {
+            name: "big_tree_2_tl",
+            pixel_x: 64,
+            pixel_y: 0,
+        },
+        TilemapSprite {
+            name: "big_tree_2_tr",
+            pixel_x: 96,
+            pixel_y: 0,
+        },
+        TilemapSprite {
+            name: "big_tree_2_bl",
+            pixel_x: 64,
+            pixel_y: 32,
+        },
+        TilemapSprite {
+            name: "big_tree_2_br",
+            pixel_x: 96,
+            pixel_y: 32,
+        },
+        TilemapSprite {
+            name: "plant_1",
+            pixel_x: 128,
+            pixel_y: 64,
+        },
+        TilemapSprite {
+            name: "plant_2",
+            pixel_x: 160,
+            pixel_y: 64,
+        },
+        TilemapSprite {
+            name: "plant_3",
+            pixel_x: 192,
+            pixel_y: 64,
+        },
+        TilemapSprite {
+            name: "plant_4",
+            pixel_x: 224,
+            pixel_y: 64,
+        },
+        TilemapSprite {
+            name: "rock_1",
+            pixel_x: 0,
+            pixel_y: 128,
+        },
+        TilemapSprite {
+            name: "rock_2",
+            pixel_x: 32,
+            pixel_y: 128,
+        },
+        TilemapSprite {
+            name: "rock_3",
+            pixel_x: 64,
+            pixel_y: 128,
+        },
+        TilemapSprite {
+            name: "rock_4",
+            pixel_x: 96,
+            pixel_y: 128,
+        },
+        TilemapSprite {
+            name: "small_tree_top",
+            pixel_x: 128,
+            pixel_y: 128,
+        },
+        TilemapSprite {
+            name: "small_tree_bottom",
+            pixel_x: 128,
+            pixel_y: 160,
+        },
+        TilemapSprite {
+            name: "tree_stump_1",
+            pixel_x: 192,
+            pixel_y: 128,
+        },
+        TilemapSprite {
+            name: "tree_stump_2",
+            pixel_x: 224,
+            pixel_y: 128,
+        },
+        TilemapSprite {
+            name: "tree_stump_3",
+            pixel_x: 0,
+            pixel_y: 192,
+        },
     ],
 };

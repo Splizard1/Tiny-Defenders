@@ -63,6 +63,11 @@ pub fn build_world() -> (
         &mut socket_collection,
     );
 
+    build_props_layer(
+        &mut terrain_model_builder,
+        &terrain_sockets,
+        &mut socket_collection,
+    );
     let (assets, models) = terrain_model_builder.into_parts();
 
     (assets, models, socket_collection)
@@ -361,7 +366,7 @@ pub fn build_water_layer(
     );
 
     // Main water tile
-    const WATER_WEIGHT: f32 = 0.02;
+    const WATER_WEIGHT: f32 = 0.03;
     terrain_model_builder
         .create_model(
             SocketsCartesian3D::Simple {
@@ -483,4 +488,172 @@ pub fn build_water_layer(
         terrain_sockets.yellow_grass.layer_up,
         vec![terrain_sockets.water.layer_down],
     );
+}
+
+pub fn build_props_layer(
+    terrain_model_builder: &mut TerrainModelBuilder,
+    terrain_sockets: &TerrainSockets,
+    socket_collection: &mut SocketCollection,
+) {
+    terrain_model_builder.create_model(
+        SocketsCartesian3D::Multiple {
+            x_pos: vec![terrain_sockets.void],
+            x_neg: vec![terrain_sockets.void],
+            z_pos: vec![terrain_sockets.props.layer_up],
+            z_neg: vec![terrain_sockets.props.layer_down],
+            y_pos: vec![terrain_sockets.void],
+            y_neg: vec![terrain_sockets.void],
+        },
+        Vec::new(),
+    );
+    // Weight constants for different prop types
+    const PROPS_WEIGHT: f32 = 0.015;
+    const ROCKS_WEIGHT: f32 = 0.01;
+    const PLANTS_WEIGHT: f32 = 0.025;
+    const STUMPS_WEIGHT: f32 = 0.012;
+
+    // Base prop template - single tile props
+    let prop = SocketsCartesian3D::Simple {
+        x_pos: terrain_sockets.void,
+        x_neg: terrain_sockets.void,
+        z_pos: terrain_sockets.props.layer_up,
+        z_neg: terrain_sockets.props.props_down,
+        y_pos: terrain_sockets.void,
+        y_neg: terrain_sockets.void,
+    }
+    .to_template()
+    .with_weight(PROPS_WEIGHT);
+
+    // Create different prop types with different weights
+    let plant_prop = prop.clone().with_weight(PLANTS_WEIGHT);
+    let stump_prop = prop.clone().with_weight(STUMPS_WEIGHT);
+    let rock_prop = prop.clone().with_weight(ROCKS_WEIGHT);
+
+    // Small tree (2 tiles high)
+    terrain_model_builder.create_model(
+        plant_prop.clone(),
+        vec![
+            SpawnableAsset::new("small_tree_bottom"),
+            SpawnableAsset::new("small_tree_top").with_grid_offset(GridDelta::new(0, 1, 0)),
+        ],
+    );
+
+    // Big tree 1 (2x2 tiles)
+    terrain_model_builder
+        .create_model(
+            SocketsCartesian3D::Simple {
+                x_pos: terrain_sockets.props.big_tree_1_base,
+                x_neg: terrain_sockets.void,
+                z_pos: terrain_sockets.props.layer_up,
+                z_neg: terrain_sockets.props.props_down,
+                y_pos: terrain_sockets.void,
+                y_neg: terrain_sockets.void,
+            },
+            vec![
+                SpawnableAsset::new("big_tree_1_bl"),
+                SpawnableAsset::new("big_tree_1_tl").with_grid_offset(GridDelta::new(0, 1, 0)),
+            ],
+        )
+        .with_weight(PROPS_WEIGHT);
+
+    terrain_model_builder
+        .create_model(
+            SocketsCartesian3D::Simple {
+                x_pos: terrain_sockets.void,
+                x_neg: terrain_sockets.props.big_tree_1_base,
+                z_pos: terrain_sockets.props.layer_up,
+                z_neg: terrain_sockets.props.props_down,
+                y_pos: terrain_sockets.void,
+                y_neg: terrain_sockets.void,
+            },
+            vec![
+                SpawnableAsset::new("big_tree_1_br"),
+                SpawnableAsset::new("big_tree_1_tr").with_grid_offset(GridDelta::new(0, 1, 0)),
+            ],
+        )
+        .with_weight(PROPS_WEIGHT);
+
+    // Big tree 2 (2x2 tiles)
+    terrain_model_builder
+        .create_model(
+            SocketsCartesian3D::Simple {
+                x_pos: terrain_sockets.props.big_tree_2_base,
+                x_neg: terrain_sockets.void,
+                z_pos: terrain_sockets.props.layer_up,
+                z_neg: terrain_sockets.props.props_down,
+                y_pos: terrain_sockets.void,
+                y_neg: terrain_sockets.void,
+            },
+            vec![
+                SpawnableAsset::new("big_tree_2_bl"),
+                SpawnableAsset::new("big_tree_2_tl").with_grid_offset(GridDelta::new(0, 1, 0)),
+            ],
+        )
+        .with_weight(PROPS_WEIGHT);
+
+    terrain_model_builder
+        .create_model(
+            SocketsCartesian3D::Simple {
+                x_pos: terrain_sockets.void,
+                x_neg: terrain_sockets.props.big_tree_2_base,
+                z_pos: terrain_sockets.props.layer_up,
+                z_neg: terrain_sockets.props.props_down,
+                y_pos: terrain_sockets.void,
+                y_neg: terrain_sockets.void,
+            },
+            vec![
+                SpawnableAsset::new("big_tree_2_br"),
+                SpawnableAsset::new("big_tree_2_tr").with_grid_offset(GridDelta::new(0, 1, 0)),
+            ],
+        )
+        .with_weight(PROPS_WEIGHT);
+
+    // Tree stumps
+    terrain_model_builder.create_model(
+        stump_prop.clone(),
+        vec![SpawnableAsset::new("tree_stump_1")],
+    );
+    terrain_model_builder.create_model(
+        stump_prop.clone(),
+        vec![SpawnableAsset::new("tree_stump_2")],
+    );
+    terrain_model_builder.create_model(
+        stump_prop.clone(),
+        vec![SpawnableAsset::new("tree_stump_3")],
+    );
+
+    // Rocks
+    terrain_model_builder.create_model(rock_prop.clone(), vec![SpawnableAsset::new("rock_1")]);
+    terrain_model_builder.create_model(rock_prop.clone(), vec![SpawnableAsset::new("rock_2")]);
+    terrain_model_builder.create_model(rock_prop.clone(), vec![SpawnableAsset::new("rock_3")]);
+    terrain_model_builder.create_model(rock_prop.clone(), vec![SpawnableAsset::new("rock_4")]);
+
+    // Plants
+    terrain_model_builder.create_model(plant_prop.clone(), vec![SpawnableAsset::new("plant_1")]);
+    terrain_model_builder.create_model(plant_prop.clone(), vec![SpawnableAsset::new("plant_2")]);
+    terrain_model_builder.create_model(plant_prop.clone(), vec![SpawnableAsset::new("plant_3")]);
+    terrain_model_builder.create_model(plant_prop.clone(), vec![SpawnableAsset::new("plant_4")]);
+
+    // Add connection rules
+    socket_collection.add_connections(vec![
+        (
+            terrain_sockets.props.big_tree_1_base,
+            vec![terrain_sockets.props.big_tree_1_base],
+        ),
+        (
+            terrain_sockets.props.big_tree_2_base,
+            vec![terrain_sockets.props.big_tree_2_base],
+        ),
+    ]);
+
+    // Connect props to water layer
+    socket_collection
+        .add_rotated_connection(
+            terrain_sockets.water.layer_up,
+            vec![terrain_sockets.props.layer_down],
+        )
+        .add_rotated_connection(
+            terrain_sockets.props.props_down,
+            vec![terrain_sockets.water.ground_up],
+        );
 }
