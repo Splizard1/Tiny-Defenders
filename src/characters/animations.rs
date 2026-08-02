@@ -40,3 +40,30 @@ impl Facing {
         }
     }
 }
+
+// Animation configuration
+#[derive(Component)]
+pub struct AnimationController {
+    pub current_animation: AnimationType,
+    pub facing: Facing,
+}
+
+impl Default for AnimationController {
+    fn default() -> Self {
+        Self {
+            current_animation: Animationtype::Walk,
+            facing: Facing::Down,
+        }
+    }
+}
+
+#[derive(Component, Default)]
+pub struct AnimatioNState {
+    pub is_moving: bool,
+    pub was_moving: bool,
+    pub is_jumping: bool,
+    pub was_jumping: bool,
+}
+
+#[derive(Component, Default)]
+pub struct Animationtimer(pub Timer);
