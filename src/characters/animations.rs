@@ -48,10 +48,29 @@ pub struct AnimationController {
     pub facing: Facing,
 }
 
+impl AnimationController {
+    pub fn get_clip(&self, config: &CharacterEntry) -> Option<AnimationClip> {
+        // Step 1. Get defenition of the current animation type
+        let def = config.animations.get(&self.current_animation)?;
+        //Step 2. Calc the row based on facing direction
+        let row = if def.directional {
+            def.start_row + self.facing.direction_index()
+        } else {
+            def.start_row
+        };
+        //Step 3. Create the AnimationClip
+        Some(AnimationClip::new(
+            row,
+            def.frame_count,
+            config.atlas_columns,
+        ))
+    }
+}
+
 impl Default for AnimationController {
     fn default() -> Self {
         Self {
-            current_animation: Animationtype::Walk,
+            current_animation: AnimationType::Walk,
             facing: Facing::Down,
         }
     }
@@ -103,5 +122,78 @@ impl AnimationClip {
 
     pub fn is_complete(self, current_index: usize, timer_finished: bool) -> bool {
         current_index >= self.last && timer_finished
+    }
+}
+
+pub fn animate_characters(
+    time: Res<Time>,
+    mut query: Query<(
+        &mut AnimationTimer,
+        &mut Srite,
+        &Animationcontroller,
+        &AnimationState,
+        &CharacterEntry,
+    )>,
+) {
+    for (animated, state, mut timer, mut sprite, config) in query.iter_mut() {
+        let Some(atlas) = sprite.texture_atlas.as_mut() else {
+            continue;
+        };
+
+        // Get the correct clip for current state/facing
+        let Some(clip) = animated.get_clip(config) else {
+            continue;
+        };
+
+        // Get timing info
+        let Some(anim_def) = config.animations.get(&animated.current_animation) else {
+            continue;
+        };
+
+        // Safety: If we somehow ended up on a frame outside our clip, reset.
+        if !clip.contains(atlas.index) {
+            atlas.index = clip.start();
+            timer.0.reset();
+        }
+
+        // Detect state changes
+        let just_started_moving = state.is_moving && !state.was_moving;
+        let just_stopped_moving = !state.is_moving && state.was_moving;
+        let just_started_jumping = state.is_jumping && !state.was_jumping;
+        let just_stopped_jumping = !state.is_jumping && state.was_jumping;
+
+        let should_animate = state.is_jumping || state.is_moving;
+        let animation_changed = just_started_moving
+            || just_started_jumping
+            || just_stopped_moving
+            || just_stopped_jumping;
+
+        if animation_changed {
+            // Reset animation
+            atlas.index = clip.start();
+            timer
+                .0
+                .set_duration(std::time::Duration::from_secs_f32(anim_def.frame_time));
+            timer.0.reset();
+        } else if should_animate {
+            // Advance animation
+            timer.tick(time.delta());
+            if timer.just_finished() {
+                atlas.index = clip.next(atlas.index);
+            }
+        } else {
+            // When idle (not moving or jumping), stay on frame 0
+            if atlas.index != clip.start() {
+                atlas.index = clip.start();
+            }
+        }
+    }
+}
+
+// Helper to update "was_moving" flags at the end of the frame
+pub fn update_animation_flags(mut query: Query<&mut AnimationState>) {
+    for mut state in query.iter_mut() {
+        state.was_moving = state.is_moving;
+        state.was_jumping = state.is_jumping;
     }
 }
