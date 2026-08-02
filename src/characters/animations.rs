@@ -67,3 +67,41 @@ pub struct AnimatioNState {
 
 #[derive(Component, Default)]
 pub struct Animationtimer(pub Timer);
+
+#[derive(Clone, Copy)]
+pub struct AnimationClip {
+    first: usize,
+    last: usize,
+}
+
+impl AnimationClip {
+    pub fn new(row: usize, frame_count: usize, atlas_culumns: usize) -> Self {
+        let first = row * atlas_columns;
+        Self {
+            first,
+            last: first + frame_count - 1,
+        }
+    }
+
+    pub fn start(self) -> usize {
+        self.first
+    }
+
+    // Check if frame index belongs to this clip
+    pub fn contains(self, index: usize) -> bool {
+        (self.first..=self.last).contains(&index)
+    }
+
+    //Calculate the nxt frame, loop back
+    pub fn next(self, index: usize) -> usize {
+        if index >= self.last {
+            self.first
+        } else {
+            index + 1
+        }
+    }
+
+    pub fn is_complete(self, current_index: usize, timer_finished: bool) -> bool {
+        current_index >= self.last && timer_finished
+    }
+}
