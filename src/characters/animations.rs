@@ -77,7 +77,7 @@ impl Default for AnimationController {
 }
 
 #[derive(Component, Default)]
-pub struct AnimatioNState {
+pub struct AnimationState {
     pub is_moving: bool,
     pub was_moving: bool,
     pub is_jumping: bool,
@@ -85,7 +85,7 @@ pub struct AnimatioNState {
 }
 
 #[derive(Component, Default)]
-pub struct Animationtimer(pub Timer);
+pub struct AnimationTimer(pub Timer);
 
 #[derive(Clone, Copy)]
 pub struct AnimationClip {
@@ -94,7 +94,7 @@ pub struct AnimationClip {
 }
 
 impl AnimationClip {
-    pub fn new(row: usize, frame_count: usize, atlas_culumns: usize) -> Self {
+    pub fn new(row: usize, frame_count: usize, atlas_columns: usize) -> Self {
         let first = row * atlas_columns;
         Self {
             first,
@@ -128,64 +128,59 @@ impl AnimationClip {
 pub fn animate_characters(
     time: Res<Time>,
     mut query: Query<(
-        &mut AnimationTimer,
-        &mut Srite,
-        &Animationcontroller,
+        &AnimationController,
         &AnimationState,
-        &CharacterEntry,
+        &mut AnimationTimer,
+        &mut Sprite,
+        &CharacterConfig,
     )>,
 ) {
-    for (animated, state, mut timer, mut sprite, config) in query.iter_mut() {
+    for (controller, state, mut timer, mut sprite, config) in &mut query {
         let Some(atlas) = sprite.texture_atlas.as_mut() else {
             continue;
         };
 
-        // Get the correct clip for current state/facing
-        let Some(clip) = animated.get_clip(config) else {
+        let Some(clip) = controller.get_clip(config) else {
             continue;
         };
 
-        // Get timing info
-        let Some(anim_def) = config.animations.get(&animated.current_animation) else {
+        let Some(anim_def) = config.animations.get(&controller.current_animation) else {
             continue;
         };
 
-        // Safety: If we somehow ended up on a frame outside our clip, reset.
         if !clip.contains(atlas.index) {
             atlas.index = clip.start();
             timer.0.reset();
         }
 
-        // Detect state changes
         let just_started_moving = state.is_moving && !state.was_moving;
         let just_stopped_moving = !state.is_moving && state.was_moving;
         let just_started_jumping = state.is_jumping && !state.was_jumping;
         let just_stopped_jumping = !state.is_jumping && state.was_jumping;
 
         let should_animate = state.is_jumping || state.is_moving;
+
         let animation_changed = just_started_moving
-            || just_started_jumping
             || just_stopped_moving
+            || just_started_jumping
             || just_stopped_jumping;
 
         if animation_changed {
-            // Reset animation
             atlas.index = clip.start();
+
             timer
                 .0
                 .set_duration(std::time::Duration::from_secs_f32(anim_def.frame_time));
+
             timer.0.reset();
         } else if should_animate {
-            // Advance animation
-            timer.tick(time.delta());
-            if timer.just_finished() {
+            timer.0.tick(time.delta());
+
+            if timer.0.just_finished() {
                 atlas.index = clip.next(atlas.index);
             }
         } else {
-            // When idle (not moving or jumping), stay on frame 0
-            if atlas.index != clip.start() {
-                atlas.index = clip.start();
-            }
+            atlas.index = clip.start();
         }
     }
 }
