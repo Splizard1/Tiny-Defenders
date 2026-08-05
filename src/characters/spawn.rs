@@ -99,3 +99,64 @@ pub fn initialize_player_character(
         ));
     }
 }
+
+pub fn switch_character(
+    input: Res<ButtonInput<KeyCode>>,
+    mut character_index: ResMut<CurrentCharacterIndex>,
+    characters_lists: Res<Assets<CharactersList>>,
+    characters_list_res: Option<Res<CharactersListResource>>,
+    mut query: Query<(&mut CharacterEntry, &mut Sprite), With<Player>>,
+    mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    asset_server: Res<AssetServer>,
+) {
+    // Map digit keys to indices
+    const DIGIT_KEYS: [KeyCode; 9] = [
+        KeyCode::Digit1,
+        KeyCode::Digit2,
+        KeyCode::Digit3,
+        KeyCode::Digit4,
+        KeyCode::Digit5,
+        KeyCode::Digit6,
+        KeyCode::Digit7,
+        KeyCode::Digit8,
+        KeyCode::Digit9,
+    ];
+
+    // Find which digit key was pressed
+    let new_index = DIGIT_KEYS.iter().position(|&key| input.just_pressed(key));
+
+    let Some(new_index) = new_index else {
+        return;
+    };
+
+    let Some(characters_list_res) = characters_list_res else {
+        return;
+    };
+
+    let Some(characters_list) = characters_lists.get(&characters_list_res.handle) else {
+        return;
+    };
+
+    if new_index >= characters_list.characters.len() {
+        return;
+    }
+
+    // Update character index
+    character_index.index = new_index;
+
+    // Update player entity
+    let Ok((mut current_entry, mut sprite)) = query.single_mut() else {
+        return;
+    };
+
+    let character_entry = &characters_list.characters[new_index];
+
+    // Update character entry
+    *current_entry = character_entry.clone();
+
+    // Update sprite with new texture
+    let texture = asset_server.load(&character_entry.texture_path);
+    let layout = create_character_atlas_layout(&mut atlas_layouts, character_entry);
+
+    *sprite = Sprite::from_atlas_image(texture, TextureAtlas { layout, index: 0 });
+}
