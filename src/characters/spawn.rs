@@ -1,5 +1,5 @@
-use crate::characters::animation::*;
-use crate::characters::config::{CharacterEntry, CharactersList};
+use crate::characters::animations::*;
+use crate::characters::config::{AnimationType, CharacterEntry, CharactersList};
 use crate::characters::movement::Player;
 use bevy::prelude::*;
 
@@ -14,6 +14,14 @@ pub struct CurrentCharacterIndex {
 #[derive(Resource)]
 pub struct CharactersListResource {
     pub handle: Handle<CharactersList>,
+}
+
+#[derive(Resource)]
+pub struct PendingCharacterSwitch {
+    pub index: usize,
+    pub character: CharacterEntry,
+    pub texture: Handle<Image>,
+    pub layout: Handle<TextureAtlasLayout>,
 }
 
 // Creates a texture atlas layout for a character
@@ -91,7 +99,7 @@ pub fn initialize_player_character(
             AnimationController::default(),
             AnimationState::default(),
             AnimationTimer(Timer::from_seconds(
-                DEFAULT_ANIMATION_FRAME_TIME,
+                ANIMATION_FRAME_TIME,
                 TimerMode::Repeating,
             )),
             character_entry.clone(),
@@ -101,15 +109,13 @@ pub fn initialize_player_character(
 }
 
 pub fn switch_character(
+    mut commands: Commands,
     input: Res<ButtonInput<KeyCode>>,
-    mut character_index: ResMut<CurrentCharacterIndex>,
     characters_lists: Res<Assets<CharactersList>>,
     characters_list_res: Option<Res<CharactersListResource>>,
-    mut query: Query<(&mut CharacterEntry, &mut Sprite), With<Player>>,
     mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     asset_server: Res<AssetServer>,
 ) {
-    // Map digit keys to indices
     const DIGIT_KEYS: [KeyCode; 9] = [
         KeyCode::Digit1,
         KeyCode::Digit2,
@@ -122,10 +128,7 @@ pub fn switch_character(
         KeyCode::Digit9,
     ];
 
-    // Find which digit key was pressed
-    let new_index = DIGIT_KEYS.iter().position(|&key| input.just_pressed(key));
-
-    let Some(new_index) = new_index else {
+    let Some(new_index) = DIGIT_KEYS.iter().position(|key| input.just_pressed(*key)) else {
         return;
     };
 
@@ -137,26 +140,84 @@ pub fn switch_character(
         return;
     };
 
-    if new_index >= characters_list.characters.len() {
-        return;
-    }
-
-    // Update character index
-    character_index.index = new_index;
-
-    // Update player entity
-    let Ok((mut current_entry, mut sprite)) = query.single_mut() else {
+    let Some(character_entry) = characters_list.characters.get(new_index) else {
         return;
     };
 
-    let character_entry = &characters_list.characters[new_index];
+    // Start loading the texture, but keep the current sprite visible.
+    let texture: Handle<Image> = asset_server.load(character_entry.texture_path.clone());
 
-    // Update character entry
-    *current_entry = character_entry.clone();
-
-    // Update sprite with new texture
-    let texture = asset_server.load(&character_entry.texture_path);
     let layout = create_character_atlas_layout(&mut atlas_layouts, character_entry);
 
-    *sprite = Sprite::from_atlas_image(texture, TextureAtlas { layout, index: 0 });
+    commands.insert_resource(PendingCharacterSwitch {
+        index: new_index,
+        character: character_entry.clone(),
+        texture,
+        layout,
+    });
+}
+
+pub fn apply_character_switch(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    pending: Option<Res<PendingCharacterSwitch>>,
+    mut character_index: ResMut<CurrentCharacterIndex>,
+    mut query: Query<
+        (
+            &mut CharacterEntry,
+            &mut Sprite,
+            &mut AnimationController,
+            &mut AnimationState,
+            &mut AnimationTimer,
+        ),
+        With<Player>,
+    >,
+) {
+    let Some(pending) = pending else {
+        return;
+    };
+
+    // Keep displaying the old character until the new image is ready.
+    if !asset_server.is_loaded_with_dependencies(pending.texture.id()) {
+        return;
+    }
+
+    let Ok((mut current_entry, mut sprite, mut animated, mut state, mut timer)) =
+        query.single_mut()
+    else {
+        return;
+    };
+
+    animated.current_animation = AnimationType::Walk;
+
+    // Start on the correct directional row, rather than always atlas index 0.
+    let start_index = animated
+        .get_clip(&pending.character)
+        .map_or(0, |clip| clip.start());
+
+    *current_entry = pending.character.clone();
+
+    *sprite = Sprite::from_atlas_image(
+        pending.texture.clone(),
+        TextureAtlas {
+            layout: pending.layout.clone(),
+            index: start_index,
+        },
+    );
+
+    state.is_moving = false;
+    state.was_moving = false;
+    state.is_jumping = false;
+    state.was_jumping = false;
+
+    if let Some(walk_definition) = pending.character.animations.get(&AnimationType::Walk) {
+        timer.0.set_duration(std::time::Duration::from_secs_f32(
+            walk_definition.frame_time,
+        ));
+    }
+
+    timer.0.reset();
+    character_index.index = pending.index;
+
+    commands.remove_resource::<PendingCharacterSwitch>();
 }

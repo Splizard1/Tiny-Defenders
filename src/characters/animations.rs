@@ -1,4 +1,4 @@
-use crate::characters::config::{AnimationType, CharacterConfig};
+use crate::characters::config::{AnimationType, CharacterEntry};
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -34,8 +34,8 @@ impl Facing {
     fn direction_index(self) -> usize {
         match self {
             Facing::Up => 0,
-            Facing::Down => 1,
-            Facing::Left => 2,
+            Facing::Left => 1,
+            Facing::Down => 2,
             Facing::Right => 3,
         }
     }
@@ -132,7 +132,7 @@ pub fn animate_characters(
         &AnimationState,
         &mut AnimationTimer,
         &mut Sprite,
-        &CharacterConfig,
+        &CharacterEntry,
     )>,
 ) {
     for (controller, state, mut timer, mut sprite, config) in &mut query {

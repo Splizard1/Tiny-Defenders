@@ -45,7 +45,7 @@ impl CharacterEntry {
     }
 }
 
-#[derive(Asset, TypePath, Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, bevy::asset::Asset, bevy::reflect::TypePath)]
 pub struct CharactersList {
     pub characters: Vec<CharacterEntry>,
 }

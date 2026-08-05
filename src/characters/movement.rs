@@ -1,4 +1,4 @@
-use crate::characters::animation::*;
+use crate::characters::animations::*;
 use crate::characters::config::{AnimationType, CharacterEntry};
 use bevy::prelude::*;
 
@@ -114,7 +114,7 @@ pub fn update_jump_state(
         };
 
         // Check if jump animation has completed
-        if clip.is_complete(atlas.index, timer.just_finished()) {
+        if clip.is_complete(atlas.index, timer.0.just_finished()) {
             state.is_jumping = false;
             animated.current_animation = AnimationType::Walk;
         }

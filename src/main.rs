@@ -1,3 +1,4 @@
+mod characters;
 mod map;
 
 use bevy::{
@@ -31,6 +32,7 @@ fn main() {
                 .set(ImagePlugin::default_nearest()),
         )
         .add_plugins(ProcGenSimplePlugin::<Cartesian3D, Sprite>::default())
+        .add_plugins(characters::CharactersPlugin)
         .add_systems(Startup, (setup_camera, setup_generator))
         .run();
 }

@@ -20,7 +20,7 @@ fn build_dirt_layer(
             },
             vec![SpawnableAsset::new("dirt")],
         )
-        .with_weight(20.);
+        .with_weight(20.0_f32);
 
     socket_collection.add_connections(vec![(
         terrain_sockets.dirt.material,
@@ -106,7 +106,7 @@ fn build_grass_layer(
             },
             vec![SpawnableAsset::new("green_grass")],
         )
-        .with_weight(5.);
+        .with_weight(5.0_f32);
 
     // Outer corner template
     let green_grass_corner_out = SocketsCartesian3D::Simple {
@@ -243,7 +243,7 @@ fn build_yellow_grass_layer(
             },
             vec![SpawnableAsset::new("yellow_grass")],
         )
-        .with_weight(5.);
+        .with_weight(5.0_f32);
 
     // Outer corner template
     let yellow_grass_corner_out = SocketsCartesian3D::Simple {

@@ -7,7 +7,9 @@ name = "Tiny_Defenders"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy_common_assets",
  "bevy_procedural_tilemaps",
+ "serde",
 ]
 
 [[package]]
@@ -400,7 +402,7 @@ dependencies = [
  "downcast-rs 2.0.2",
  "either",
  "petgraph",
- "ron",
+ "ron 0.12.1",
  "serde",
  "smallvec",
  "thiserror 2.0.18",
@@ -497,7 +499,7 @@ dependencies = [
  "futures-lite",
  "futures-util",
  "js-sys",
- "ron",
+ "ron 0.12.1",
  "serde",
  "stackfuture",
  "thiserror 2.0.18",
@@ -578,6 +580,21 @@ dependencies = [
  "serde",
  "thiserror 2.0.18",
  "wgpu-types",
+]
+
+[[package]]
+name = "bevy_common_assets"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "481157b530915653dc6c6ba2799f4285d5cda25b9819ff6dd3c02181d18136fc"
+dependencies = [
+ "anyhow",
+ "bevy_app",
+ "bevy_asset",
+ "bevy_reflect",
+ "ron 0.11.0",
+ "serde",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -1324,7 +1341,7 @@ dependencies = [
  "bevy_transform",
  "bevy_utils",
  "derive_more",
- "ron",
+ "ron 0.12.1",
  "serde",
  "thiserror 2.0.18",
  "uuid",
@@ -2340,7 +2357,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3465,7 +3482,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -4306,6 +4323,19 @@ dependencies = [
 
 [[package]]
 name = "ron"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db09040cc89e461f1a265139777a2bde7f8d8c67c4936f700c63ce3e2904d468"
+dependencies = [
+ "base64",
+ "bitflags 2.13.0",
+ "serde",
+ "serde_derive",
+ "unicode-ident",
+]
+
+[[package]]
+name = "ron"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4147b952f3f819eca0e99527022f7d6a8d05f111aeb0a62960c74eb283bec8fc"
@@ -4368,7 +4398,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -5479,7 +5509,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
